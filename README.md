@@ -4,6 +4,8 @@
 
 A high-performance DNS server with ad-blocking, smart caching, and web-based management interface.
 
+![Dashboard](en.jpeg)
+
 ## Features
 
 ### Multi-Protocol Support
