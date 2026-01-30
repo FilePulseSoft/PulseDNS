@@ -4,8 +4,6 @@
 
 A high-performance DNS server with ad-blocking, smart caching, and web-based management interface.
 
-![Dashboard](en.jpeg)
-
 ## Features
 
 ### Multi-Protocol Support
@@ -19,6 +17,7 @@ A high-performance DNS server with ad-blocking, smart caching, and web-based man
 
 - **Stale-While-Revalidate** - Return cached responses instantly while refreshing in background
 - **Flexible TTL Modes** - Fixed, multiplier, or respect original DNS TTL
+- **Per-Record TTL Preservation** - Cached responses keep each record's TTL
 - **Cache Persistence** - Survive restarts without losing cached data
 - **Configurable Limits** - Set maximum cache entries (default: 100,000)
 
@@ -26,7 +25,7 @@ A high-performance DNS server with ad-blocking, smart caching, and web-based man
 
 - **Local Hosts Files** - Load multiple local blocklists
 - **Remote Updates** - Auto-fetch and update blocklists from URLs
-- **CNAME Chain Tracking** - Block ads hidden behind CNAME redirects (configurable depth)
+- **CNAME/HTTPS Alias Tracking** - Block ads hidden behind CNAME/HTTPS/SVCB aliases (configurable depth)
 - **Block Statistics** - Track blocked query counts
 
 ### Upstream Management
@@ -205,9 +204,10 @@ update_urls = [
 ]
 update_interval_seconds = 86400  # 24 hours
 
-# CNAME tracking
+# CNAME/HTTPS alias tracking
 cname_blocking = true
 cname_max_depth = 8
+cname_probe_upstream = false  # Optional extra upstream lookup to complete alias chain
 block_ttl_seconds = 60
 
 # Statistics

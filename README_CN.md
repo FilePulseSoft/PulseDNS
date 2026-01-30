@@ -4,8 +4,6 @@
 
 高性能 DNS 服务器，支持广告屏蔽、智能缓存和 Web 管理界面。
 
-![仪表盘](cn.jpeg)
-
 ## 功能特性
 
 ### 多协议支持
@@ -19,6 +17,7 @@
 
 - **Stale-While-Revalidate** - 立即返回缓存响应，后台异步刷新
 - **灵活的 TTL 模式** - 固定值、倍数或遵循 DNS 原始 TTL
+- **逐条记录 TTL** - 缓存响应保留每条记录的 TTL
 - **缓存持久化** - 重启不丢失缓存数据
 - **可配置上限** - 设置最大缓存条目数（默认 100,000）
 
@@ -26,7 +25,7 @@
 
 - **本地 Hosts 文件** - 加载多个本地屏蔽列表
 - **远程更新** - 自动从 URL 获取并更新屏蔽列表
-- **CNAME 链追踪** - 屏蔽隐藏在 CNAME 重定向后的广告（可配置深度）
+- **CNAME/HTTPS 别名追踪** - 屏蔽隐藏在 CNAME/HTTPS/SVCB 别名后的广告（可配置深度）
 - **屏蔽统计** - 统计屏蔽查询次数
 
 ### 上游管理
@@ -205,9 +204,10 @@ update_urls = [
 ]
 update_interval_seconds = 86400  # 24 小时
 
-# CNAME 追踪
+# CNAME/HTTPS 别名追踪
 cname_blocking = true
 cname_max_depth = 8
+cname_probe_upstream = false  # 可选：补全别名链（有额外查询开销）
 block_ttl_seconds = 60
 
 # 统计
