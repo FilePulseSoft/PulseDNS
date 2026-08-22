@@ -2,67 +2,74 @@
 
 [English](README.md)
 
-高性能 DNS 服务器，支持广告屏蔽、智能缓存和 Web 管理界面。
+新一代高性能 DNS 服务器，集成了全协议加密、智能极速缓存、多源规则广告拦截、实时查询监控流与现代化 Web 控制台。
 
 ![仪表盘](cn.jpeg)
 
 ## 功能特性
 
-### 多协议支持
+### 全协议与现代加密支持
 
-- **UDP/TCP DNS** - 标准 DNS 协议，最大兼容性
-- **DNS-over-HTTPS (DoH)** - 加密 DNS，支持 HTTP/1.1、HTTP/2 和 HTTP/3 (QUIC)
-- **DNS-over-TLS (DoT)** - 隐私保护的加密 DNS
-- **IPv4 & IPv6 双栈** - 客户端连接和上游服务器同时支持 IPv4 和 IPv6
+- **UDP / TCP DNS** - 标准 DNS 协议，最大化设备兼容性
+- **DNS-over-HTTPS (DoH)** - 加密 DNS，全面支持 HTTP/1.1、HTTP/2 及 HTTP/3 (QUIC)
+- **DNS-over-TLS (DoT)** - 隐私保护的 TLS 加密 DNS
+- **DNS-over-QUIC (DoQ)** - 符合 RFC 9250 规范的 QUIC 加密 DNS，超低连接延迟
+- **IPv4 & IPv6 双栈** - 客户端监听与上游解析全面支持 IPv4 / IPv6 双栈环境
 
-### 智能缓存
+### 智能极速缓存与留存
 
-- **Stale-While-Revalidate** - 立即返回缓存响应，后台异步刷新
-- **灵活的 TTL 模式** - 固定值、倍数或遵循 DNS 原始 TTL
-- **逐条记录 TTL** - 缓存响应保留每条记录的 TTL
-- **缓存持久化** - 重启不丢失缓存数据
-- **可配置上限** - 设置最大缓存条目数（默认 100,000）
+- **Stale-While-Revalidate** - 毫秒级返回缓存响应，后台异步刷新（零延迟感知）
+- **精准保留逐条记录 TTL** - 缓存记录精准保留原始各记录的独立 TTL
+- **灵活的 TTL 策略** - 支持遵循 DNS 原始 TTL、固定值或倍数模式
+- **缓存跨重启持久化** - 重启进程保留缓存数据，杜绝冷启动性能抖动
+- **无锁极速读取与请求去重** - 高并发无锁缓存检索与请求合并去重
 
-### 广告屏蔽
+### 多源规则与深度广告防护
 
-- **本地 Hosts 文件** - 加载多个本地屏蔽列表
-- **远程更新** - 自动从 URL 获取并更新屏蔽列表
-- **CNAME/HTTPS 别名追踪** - 屏蔽隐藏在 CNAME/HTTPS/SVCB 别名后的广告（可配置深度）
-- **屏蔽统计** - 统计屏蔽查询次数
+- **多源规则订阅** - 灵活组合本地 hosts 文件与多个远程订阅 URL
+- **即时与定时更新** - Web 控制台一键立即下载更新规则库，支持后台定时自动同步
+- **CNAME / HTTPS 别名追踪** - 深度追踪隐藏在 CNAME、HTTPS、SVCB 别名背后的广告与威胁
+- **防护与流量统计** - 实时统计拦截查询数与流量节省估算
 
-### 上游管理
+### 智能上游优选与耗时分析
 
-- **First-Wins 竞速** - 并发查询所有上游，使用最快的响应
-- **多协议上游** - 混合使用 UDP、DoH、DoT 上游服务器
-- **性能监控** - 追踪每个上游的响应时间和获胜率
+- **First-Wins 并发竞速** - 多上游、跨协议并发优选，自动采用最快响应
+- **上游性能监控** - 实时追踪各上游服务器响应延迟、胜率及抢答累计节省耗时
+- **智能响应过滤** - 自动识别并跳过受阻响应与空响应
 
-### 自定义 DNS 记录
+### 响应策略与网关适配
 
-- **9 种记录类型** - A、AAAA、CNAME、TXT、MX、SRV、NS、PTR、CAA
-- **动态管理** - 通过 REST API 添加/删除记录，无需重启
-- **最高优先级** - 自定义记录优先于上游查询
+- **SVCB / HTTPS 策略控制** - 支持调控 SVCB/HTTPS 记录中的 ECH（Encrypted Client Hello）参数，保障企业网关过滤与网络识别兼容，同时完整保留 ALPN、HTTP/3、端口及别名提示
 
-### Web 管理界面
+### 实时查询流与监控看板
 
-- **实时仪表板** - 监控查询数、缓存命中、屏蔽请求
-- **缓存管理** - 浏览、搜索、清除缓存条目
-- **屏蔽列表** - 查看所有被屏蔽的域名
-- **记录管理** - 管理自定义 DNS 记录
-- **国际化** - 中英文界面
+- **实时查询流监控** - 动态流式监控实时 DNS 请求，即时查看客户端 IP、协议、查询类型、处理耗时与响应码
+- **多维可视化看板** - 直观掌握总查询量、缓存命中率、节省时间与系统运行指标
 
-## 性能
+### 动态自定义 DNS 记录
 
-- **无 GC、无 STW** - 零垃圾回收停顿，确保持续低延迟响应
-- 全协议高并发支持（UDP、TCP、DoH HTTP/1.1/2/3、DoT）
-- 无锁高性能缓存查询
-- 查询去重（singleflight），减少上游负载
-- HTTP/3 (QUIC) 加速 DoH 查询
+- **9 种标准记录类型** - 完整支持 A、AAAA、CNAME、TXT、MX、SRV、NS、PTR、CAA
+- **动态热更新** - 通过 Web 界面或 REST API 实时添加/修改/删除记录，无需重启服务
+- **最高解析优先级** - 自定义记录优先于上游查询结果
 
-## 安装
+### 现代化控制台与内置安全防护
+
+- **现代化 Web 控制台** - 响应式设计，支持浅色、深色及跟随系统主题，中英文界面无缝切换
+- **自适应防爆破限流** - 内置登录速率限制与恶意 IP 自动封禁锁定
+- **安全认证与代理支持** - 采用 bcrypt 密码加密，支持可信代理 CIDR 提取真实客户端 IP
+
+## 性能表现
+
+- **无 GC、无 STW** - 零垃圾回收停顿，在高并发场景下保持稳健的超低延迟响应
+- **全协议高并发** - 针对 UDP、TCP、DoH (HTTP/1.1/2/3)、DoT、DoQ 进行全链路高并发优化
+- **无锁架构与请求去重** - 高效无锁缓存读写与 singleflight 请求去重
+- **HTTP/3 & QUIC 传输加速** - 借助新一代 QUIC 传输层降低握手与传输开销
+
+## 安装指南
 
 ### 下载
 
-从 Releases 页面下载对应平台的版本：
+从 Releases 页面下载对应操作系统的预编译包：
 
 **macOS**
 
@@ -95,13 +102,13 @@ hosts               # 本地屏蔽列表（可选）
 custom_records.json # 自定义 DNS 记录（自动创建）
 ```
 
-### 运行
+### 启动运行
 
 ```bash
 # 使用默认配置（当前目录下的 config.toml）
 ./pulse_dns
 
-# 指定配置文件
+# 指定配置文件路径
 ./pulse_dns -c /path/to/config.toml
 ```
 
@@ -120,7 +127,7 @@ port = 53
 enable = false
 port = 53
 
-# DoH 服务器（HTTPS）
+# DoH 服务器（HTTPS，支持 HTTP/1.1、HTTP/2 与 HTTP/3）
 [http_server]
 enable = true
 port = 443
@@ -132,12 +139,24 @@ key = "key.pem"
 enable = false
 port = 8053
 
-# DoT 服务器
+# DoT 服务器（TLS）
 [tls_server]
 enable = true
 port = 853
 cert = "cert.pem"
 key = "key.pem"
+
+# DoQ 服务器（基于 UDP 的 QUIC）
+[doq_server]
+enable = true
+port = 853
+cert = "cert.pem"
+key = "key.pem"
+
+# DNS 响应策略
+[dns_policy]
+# 调控 SVCB/HTTPS 记录中的 ECH 参数，满足网关可见性需求
+strip_ech = true
 ```
 
 ### 上游服务器
@@ -186,12 +205,12 @@ ttl_multiplier = 2.0       # 倍数模式使用
 min_ttl_seconds = 60       # 最小 TTL
 max_ttl_seconds = 86400    # 最大 TTL
 
-# 持久化
+# 持久化与容量上限
 persist_on_shutdown = true
 max_entries = 100000
 ```
 
-### 广告屏蔽
+### 规则与广告屏蔽
 
 ```toml
 [ad_block]
@@ -200,23 +219,23 @@ enable = true
 # 本地 hosts 文件
 hosts_files = ["hosts", "hosts.local"]
 
-# 远程屏蔽列表 URL
+# 远程规则订阅 URL
 update_urls = [
     "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
 ]
-update_interval_seconds = 86400  # 24 小时
+update_interval_seconds = 86400  # 自动更新间隔（秒）
 
-# CNAME/HTTPS 别名追踪
+# 别名深度追踪
 cname_blocking = true
 cname_max_depth = 8
-cname_probe_upstream = false  # 可选：补全别名链（有额外查询开销）
+cname_probe_upstream = false
 block_ttl_seconds = 60
 
 # 统计
 count_blocked_hits = true
 ```
 
-### 管理界面
+### 管理界面与安全
 
 ```toml
 [admin]
@@ -229,9 +248,8 @@ jwt_expiry_seconds = 86400
 static_dir = "static"
 records_file = "custom_records.json"
 
-# 信任的代理（用于 X-Forwarded-For）
+# 信任的代理 IP / CIDR（用于识别客户端真实 IP）
 trusted_proxies = ["127.0.0.1", "192.168.0.0/16"]
-# 或信任所有：trusted_proxies = ["*"]
 ```
 
 ### 统计配置
@@ -245,15 +263,15 @@ count_stale_hits = true
 
 ## 使用方法
 
-启动服务器后，你可以：
+启动服务后：
 
-1. **配置设备** 使用 DNS 服务器 IP 地址
-2. **访问管理界面** `http://服务器IP:8080`
+1. **配置设备 / 路由器** DNS 服务器地址为本机 IP。
+2. **访问 Web 管理界面** `http://服务器IP:8080`。
 3. **测试 DNS 解析**：
    ```bash
    # 测试标准查询
    dig @服务器IP example.com
 
-   # 测试广告屏蔽（应返回 0.0.0.0）
+   # 测试广告拦截（返回 0.0.0.0）
    dig @服务器IP ad.doubleclick.net
    ```

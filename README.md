@@ -2,61 +2,68 @@
 
 [中文文档](README_CN.md)
 
-A high-performance DNS server with ad-blocking, smart caching, and web-based management interface.
+A modern, high-performance DNS server featuring multi-protocol encryption, intelligent caching, multi-source ad blocking, live query streaming, and an intuitive web management console.
 
 ![Dashboard](en.jpeg)
 
 ## Features
 
-### Multi-Protocol Support
+### Multi-Protocol & Modern Encryption
 
-- **UDP/TCP DNS** - Standard DNS protocols for maximum compatibility
-- **DNS-over-HTTPS (DoH)** - Encrypted DNS with HTTP/1.1, HTTP/2, and HTTP/3 (QUIC) support
-- **DNS-over-TLS (DoT)** - Privacy-focused encrypted DNS
-- **IPv4 & IPv6 Dual-Stack** - Full support for both IPv4 and IPv6 client connections and upstream servers
+- **UDP & TCP DNS** - Standard RFC-compliant DNS for universal device compatibility
+- **DNS-over-HTTPS (DoH)** - Encrypted DNS supporting HTTP/1.1, HTTP/2, and HTTP/3 (QUIC)
+- **DNS-over-TLS (DoT)** - Privacy-preserving encrypted DNS over TLS
+- **DNS-over-QUIC (DoQ)** - RFC 9250 encrypted DNS with ultra-low connection latency
+- **IPv4 & IPv6 Dual-Stack** - Full dual-stack support across client listeners and upstream resolvers
 
-### Smart Caching
+### Intelligent Caching & Retention
 
-- **Stale-While-Revalidate** - Return cached responses instantly while refreshing in background
-- **Flexible TTL Modes** - Fixed, multiplier, or respect original DNS TTL
-- **Per-Record TTL Preservation** - Cached responses keep each record's TTL
-- **Cache Persistence** - Survive restarts without losing cached data
-- **Configurable Limits** - Set maximum cache entries (default: 100,000)
+- **Stale-While-Revalidate** - Zero-latency cached responses with background asynchronous revalidation
+- **Granular TTL Preservation** - Preserves individual record TTL values accurately
+- **Flexible TTL Modes** - Respect original DNS TTL, fixed TTL, or multiplier modes
+- **Persistent Cache** - High-capacity in-memory cache preserved across server restarts
+- **Lock-Free Reads & Deduplication** - High-throughput lock-free cache lookups and query deduplication
 
-### Ad Blocking
+### Multi-Source Protection & Ad Blocking
 
-- **Local Hosts Files** - Load multiple local blocklists
-- **Remote Updates** - Auto-fetch and update blocklists from URLs
-- **CNAME/HTTPS Alias Tracking** - Block ads hidden behind CNAME/HTTPS/SVCB aliases (configurable depth)
-- **Block Statistics** - Track blocked query counts
+- **Multi-Source Rule Subscriptions** - Combine local hosts files with remote subscription lists
+- **Instant & Scheduled Updates** - One-click instant rule downloads via Web UI and automated background syncing
+- **Deep Alias Tracking** - Uncover and block hidden ads and trackers across CNAME, HTTPS, and SVCB alias chains
+- **Protection Analytics** - Track blocked query volume and estimated bandwidth savings
 
-### Upstream Management
+### Intelligent Upstream Racing & Latency Optimization
 
-- **First-Wins Racing** - Query all upstreams concurrently, use the fastest response
-- **Multi-Protocol Upstreams** - Mix UDP, DoH, and DoT upstream servers
-- **Performance Monitoring** - Track response times and win rates per upstream
+- **Fastest-Wins Concurrent Racing** - Race queries across multiple upstreams and protocols for minimal latency
+- **Upstream Telemetry** - Monitor response latency, win rate percentages, and cumulative time savings
+- **Smart Response Filtering** - Automatically skip blocked or malformed upstream responses
 
-### Custom DNS Records
+### Response Policy & Gateway Control
 
-- **9 Record Types** - A, AAAA, CNAME, TXT, MX, SRV, NS, PTR, CAA
-- **Dynamic Management** - Add/remove records via REST API without restart
-- **Highest Priority** - Custom records take precedence over upstream
+- **SVCB / HTTPS Policy Control** - Granular control over SVCB/HTTPS records (such as ECH parameter management) for enterprise gateway visibility and firewall compatibility while preserving modern ALPN, HTTP/3, and port hints
 
-### Web Management Interface
+### Live Query Stream & Telemetry Dashboard
 
-- **Real-time Dashboard** - Monitor queries, cache hits, blocked requests
-- **Cache Management** - Browse, search, and clear cached entries
-- **Blocklist Viewer** - View all blocked domains
-- **Record Management** - Manage custom DNS records
-- **Internationalization** - English and Chinese UI
+- **Real-Time Query Monitor** - Live streaming monitor showing client IPs, query types, protocols, response codes, and durations
+- **Comprehensive Analytics** - Real-time dashboards for query rates, cache hit efficiency, time savings, and upstream performance
+
+### Dynamic DNS Records
+
+- **9 Standard Record Types** - Full support for A, AAAA, CNAME, TXT, MX, SRV, NS, PTR, and CAA
+- **Hot Updates** - Add, modify, or delete custom records dynamically via Web UI or REST API without restarting
+- **Highest Priority** - Custom records take precedence over upstream resolution
+
+### Web Console & Built-in Security
+
+- **Modern Web Interface** - Clean, responsive UI with Dark, Light, and System themes in English and Chinese
+- **Adaptive Rate Limiting** - Built-in brute-force protection with login rate limits and automatic IP lockouts
+- **Secure Authentication** - Bcrypt password hashing, secure JWT tokens, and trusted proxy CIDR support
 
 ## Performance
 
-- **No GC, No STW** - Zero garbage collection pauses for consistent low-latency responses
-- High concurrency across all protocols (UDP, TCP, DoH with HTTP/1.1/2/3, DoT)
-- High-performance caching with lock-free reads
-- Query deduplication (singleflight) to reduce upstream load
-- HTTP/3 (QUIC) acceleration for DoH queries
+- **Zero GC Pauses** - Predictable, ultra-low latency response under heavy workloads
+- **High Concurrency** - Optimized for high query throughput across all protocols (UDP, TCP, DoH, DoT, DoQ)
+- **Lock-Free Architecture** - High-concurrency lock-free cache access and query deduplication
+- **HTTP/3 & QUIC Acceleration** - Modern QUIC transport for accelerated encrypted lookups
 
 ## Installation
 
@@ -120,24 +127,36 @@ port = 53
 enable = false
 port = 53
 
-# DoH Server (HTTPS)
+# DoH Server (HTTPS with HTTP/1.1, HTTP/2, HTTP/3)
 [http_server]
 enable = true
 port = 443
 cert = "cert.pem"
 key = "key.pem"
 
-# DoH Server (HTTP, for reverse proxy)
+# DoH Server (HTTP, for reverse proxies)
 [http_plain_server]
 enable = false
 port = 8053
 
-# DoT Server
+# DoT Server (TLS)
 [tls_server]
 enable = true
 port = 853
 cert = "cert.pem"
 key = "key.pem"
+
+# DoQ Server (QUIC over UDP)
+[doq_server]
+enable = true
+port = 853
+cert = "cert.pem"
+key = "key.pem"
+
+# DNS Response Policy
+[dns_policy]
+# Control ECH parameter in SVCB/HTTPS records for gateway visibility
+strip_ech = true
 ```
 
 ### Upstream Servers
@@ -186,12 +205,12 @@ ttl_multiplier = 2.0       # For multiplier mode
 min_ttl_seconds = 60       # Minimum TTL
 max_ttl_seconds = 86400    # Maximum TTL
 
-# Persistence
+# Persistence & limits
 persist_on_shutdown = true
 max_entries = 100000
 ```
 
-### Ad Blocking
+### Ad Blocking & Rules
 
 ```toml
 [ad_block]
@@ -200,23 +219,23 @@ enable = true
 # Local hosts files
 hosts_files = ["hosts", "hosts.local"]
 
-# Remote blocklist URLs
+# Remote blocklist subscription URLs
 update_urls = [
     "https://raw.githubusercontent.com/StevenBlack/hosts/master/hosts"
 ]
-update_interval_seconds = 86400  # 24 hours
+update_interval_seconds = 86400  # Automatic refresh interval
 
-# CNAME/HTTPS alias tracking
+# Deep alias tracking
 cname_blocking = true
 cname_max_depth = 8
-cname_probe_upstream = false  # Optional extra upstream lookup to complete alias chain
+cname_probe_upstream = false
 block_ttl_seconds = 60
 
 # Statistics
 count_blocked_hits = true
 ```
 
-### Admin Interface
+### Web Management & Security
 
 ```toml
 [admin]
@@ -229,9 +248,8 @@ jwt_expiry_seconds = 86400
 static_dir = "static"
 records_file = "custom_records.json"
 
-# Trusted proxies (for X-Forwarded-For)
+# Trusted proxy CIDRs (for client IP detection)
 trusted_proxies = ["127.0.0.1", "192.168.0.0/16"]
-# Or trust all: trusted_proxies = ["*"]
 ```
 
 ### Statistics
@@ -245,15 +263,15 @@ count_stale_hits = true
 
 ## Usage
 
-After starting the server, you can:
+After starting the server:
 
-1. **Configure your devices** to use the DNS server IP address
-2. **Access the web interface** at `http://server-ip:8080`
-3. **Test DNS resolution**:
+1. **Configure your devices / routers** to use PulseDNS as the primary DNS resolver.
+2. **Access the Web Management Interface** at `http://server-ip:8080`.
+3. **Verify resolution & ad blocking**:
    ```bash
-   # Test standard query
+   # Test standard resolution
    dig @server-ip example.com
 
-   # Test ad blocking (should return 0.0.0.0)
+   # Test ad blocking (returns 0.0.0.0)
    dig @server-ip ad.doubleclick.net
    ```
